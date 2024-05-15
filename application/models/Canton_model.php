@@ -2,7 +2,7 @@
 class Canton_model extends CI_model {
 
 	function lista_cantones(){
-		 $canton= $this->db->get('canton');
+		 $canton= $this->db->get('canton0');
 		 return $canton;
 	}
 
@@ -21,7 +21,22 @@ class Canton_model extends CI_model {
 
  	function save($array)
  	{
-		$this->db->insert("canton", $array);
+		$condition = "idcanton =" . "'" . $array['idcanton'] . "'";
+		$this->db->select('*');
+		$this->db->from('canton');
+		$this->db->where($condition);
+		$this->db->limit(1);
+		$query = $this->db->get();
+		if ($query->num_rows() == 0) {
+		   $this->db->insert("canton", $array);
+		   if( $this->db->affected_rows()>0){
+			    return true;
+		   }else{
+			    return false;
+		   }
+	   }else{
+		    return false;
+		   }
  	}
 
  	function update($id,$array_item)
@@ -43,6 +58,23 @@ class Canton_model extends CI_model {
 		return $result;
  	}
 
+ 	function quitar($id)
+	{
+
+        $this->db->select('*');
+		$this->db->from('canton0');
+ 		$this->db->where('idcanton',$id);
+		$this->db->limit(1);
+		$query = $this->db->get();
+		if ($query->num_rows() != 0) {
+	 	  	$this->db->where('idcanton',$id);
+			$this->db->update('canton', array('eliminado'=>1));
+			$result=true;
+        }else{
+            $result=false;
+        }
+		return $result;
+ 	}
 
 	function elprimero()
 	{
@@ -56,7 +88,7 @@ class Canton_model extends CI_model {
 	}
 
 
-// Para ir al último registro
+
 	function elultimo()
 	{
 		$query=$this->db->order_by("idcanton")->get('canton');
@@ -69,7 +101,7 @@ class Canton_model extends CI_model {
 	}
 
 
-	// Para moverse al siguiente registro
+	
  	function siguiente($id){
  		$canton = $this->db->select("idcanton")->order_by("idcanton")->get('canton')->result_array();
 		$arr=array("idcanton"=>$id);
@@ -87,7 +119,7 @@ class Canton_model extends CI_model {
  	}
 
 
-// Para moverse al anterior registro
+
  	function anterior($id){
  		$canton = $this->db->select("idcanton")->order_by("idcanton")->get('canton')->result_array();
 		$arr=array("idcanton"=>$id);
